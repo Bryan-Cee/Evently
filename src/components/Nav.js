@@ -5,11 +5,17 @@ import "../styles/Nav.css"
 
 export default class Nav extends Component {
     render() {
+        const { login, logout, isAuthenticated } = this.props.auth;
         return (
             <nav>
                 <ul>
-                    <li><Link to="/" exact>Home</Link></li>
-                    <li><Link to="/profile" exact>Profile</Link></li>
+                    <li><Link to="/">Home</Link></li>
+                    <li><Link to="/profile">Profile</Link></li>
+                    <li>
+                        <button onClick={isAuthenticated() ? logout : login }>
+                            {isAuthenticated() ? "Logout" : "Login"}
+                        </button>
+                    </li>
                 </ul>
             </nav>
         )
