@@ -5,7 +5,7 @@ import "../styles/Nav.css"
 
 export default class Nav extends Component {
     render() {
-        const { login, logout, isAuthenticated } = this.props.auth;
+        const { login, logout, isAuthenticated, userHasScopes } = this.props.auth;
         return (
             <nav>
                 <ul>
@@ -13,6 +13,7 @@ export default class Nav extends Component {
                     <li><Link to="/profile">Profile</Link></li>
                     <li><Link to="/public">Public</Link></li>
                     {isAuthenticated() && <li><Link to="/private">Private</Link></li>}
+                    {isAuthenticated() && userHasScopes(['read:events']) && <li><Link to="/events">Events</Link></li>}
                     <li>
                         <button onClick={isAuthenticated() ? logout : login }>
                             {isAuthenticated() ? "Logout" : "Login"}
