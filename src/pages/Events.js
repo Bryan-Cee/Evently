@@ -17,18 +17,6 @@ export default class Events extends Component {
             })
             .then(data => this.setState({ events: data.events }))
             .catch(err => this.setState({ message: err.message }))
-
-        fetch('/admin', {
-            headers: {
-                Authorization: `Bearer ${this.props.auth.getAccessToken()}`
-            }
-        })
-            .then(res => {
-                if (res.ok) return res.json();
-                throw new Error("Network response was not okay")
-            })
-            .then(data => console.log({ data }))
-            .catch(err => this.setState({ message: err.message }))
     }
     render() {
         return (

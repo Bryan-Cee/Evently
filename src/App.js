@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
@@ -9,41 +8,38 @@ import Callback from './pages/Callback';
 import Public from './pages/Public';
 import Private from './pages/Private';
 import Events from './pages/Events';
+import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
+import AuthContext from './components/AuthContext';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.auth = new Auth(this.props.history)
+    this.state = {
+      auth: new Auth(this.props.history),
+      tokenRenewalComplete: false
+    }
+  }
+
+  componentDidMount() {
+    this.state.auth.renewToken(() => this.setState({ tokenRenewalComplete: true }))
   }
 
   render() {
+    const { auth } = this.state;
+    if (!this.state.tokenRenewalComplete) return "Loading...";
     return (
-      <div>
-        <Nav auth={this.auth} />
+      <AuthContext.Provider value={auth}>
+        <Nav auth={auth} />
         <div className="App">
-          <Route path="/" exact render={props => <Home auth={this.auth} {...props} />} />
-          <Route path="/callback" render={props => <Callback auth={this.auth} {...props} />} />
-          <Route path="/public" component={Public} />
-          <Route path="/private" render={
-            props => this.auth.isAuthenticated()
-              ? <Private auth={this.auth} {...props} />
-              : this.auth.login()
-          }
-          />
-          <Route path="/profile" render={
-            props => this.auth.isAuthenticated()
-              ? <Profile auth={this.auth} {...props} />
-              : <Redirect to="/" />
-          }
-          />
-          <Route path="/events" render={
-            props => this.auth.isAuthenticated() && this.auth.userHasScopes(['read:events'])
-              ? <Events auth={this.auth} {...props} />
-              : <Redirect to="/" />
-          }
-          />
+          <PublicRoute path="/" exact component={Home} />
+          <PublicRoute path="/callback" component={Callback} />
+          <PublicRoute path="/public" component={Public} />
+          <PrivateRoute path="/private" component={Private} />
+          <PrivateRoute path="/profile" component={Profile} />
+          <PrivateRoute path="/events" component={Events} scopes={["read:events"]} />
         </div>
-      </div>
+      </AuthContext.Provider>
     );
   }
 }
